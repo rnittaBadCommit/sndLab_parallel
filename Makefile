@@ -1,4 +1,4 @@
-NAME_SERVER="serveer"
+NAME_SERVER="server"
 NAME_CLIENT="client"
 
 SRCS_SERVER=srcs/server.cpp
@@ -34,4 +34,4 @@ fclean: clean
 
 -include $(DEPS_SERVER) $(DEPS_CLIENT)
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re server client
