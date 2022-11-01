@@ -8,6 +8,13 @@
 #include <arpa/inet.h> //バイトオーダの変換に利用
 #include <unistd.h> //close()に利用
 #include <string> //string型
+#include <array>  // array
+#include <cstdio>    // _popen
+#include <iostream>  // cout
+#include <memory>    // shared_ptr
+#include <string>    // string
+
+
 
 bool ExecCmd(const char* cmd, std::string& stdOut, int& exitCode) {
     std::shared_ptr<FILE> pipe(_popen(cmd, "r"), [&](FILE* p) {exitCode = _pclose(p); });
