@@ -31,17 +31,26 @@ bool ExecCmd(const char* cmd, std::string& stdOut, int& exitCode) {
     return true;
 }
 
-int main(){
-	
+const std::string &getIPAddress()
+{
 	const char* cmd = "hostname -I";
-    std::string stdOut;
+	std::string stdOut;
     int exitCode;
-    if (ExecCmd(cmd, stdOut, exitCode)) {
-        std::cout << stdOut << std::endl;
+    if (ExecCmd(cmd, stdOut, exitCode) && stdOut != "") {
+		size_t pos = stdOut.find(' ');
+		if (pos == std::string::npos)
+			return (stdOut);
+		else
+			return (stdOut.substr(0, pos));
     }
     else {
-        std::cout << "標準出力の取得に失敗しました。" << std::endl;
+        std::cout << "error: exec \"hostname -I\" fail" << std::endl;
     }
+}
+
+int main(){
+	
+    std::cout << getIPAddress();
 
     return 0;
 
