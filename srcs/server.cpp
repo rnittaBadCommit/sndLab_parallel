@@ -50,11 +50,7 @@ const std::string getIPAddress()
 
 int main(){
 	
-    std::cout << getIPAddress();
-
-    return 0;
-
-
+    std::string server_IP = getIPAddress();
 
 	//ソケットの生成
 	int sockfd = socket(AF_INET, SOCK_STREAM, 0); //アドレスドメイン, ソケットタイプ, プロトコル
@@ -69,7 +65,7 @@ int main(){
 	memset(&addr, 0, sizeof(struct sockaddr_in)); //memsetで初期化
 	addr.sin_family = AF_INET; //アドレスファミリ(ipv4)
 	addr.sin_port = htons(8080); //ポート番号,htons()関数は16bitホストバイトオーダーをネットワークバイトオーダーに変換
-	addr.sin_addr.s_addr = inet_addr("127.0.0.1"); //IPアドレス,inet_addr()関数はアドレスの翻訳
+	addr.sin_addr.s_addr = inet_addr(server_IP.c_str()); //IPアドレス,inet_addr()関数はアドレスの翻訳
 
 	//ソケット登録
 	if(bind(sockfd, (struct sockaddr *)&addr, sizeof(addr)) < 0){ //ソケット, アドレスポインタ, アドレスサイズ //エラー処理
@@ -98,13 +94,12 @@ int main(){
 	}
 
 	//受信
-	char str[12]; //受信用データ格納用
-	recv(connect, str, 12, 0); //受信
-	std::cout << str << std::endl; //標準出力
+	char str[100]; //受信用データ格納用
+	recv(connect, str, 100, 0); //受信
+	std::cout << "recieved msg: " << str << std::endl; //標準出力
 
 	//送信
-	send(connect, str, 12, 0); //送信
-	std::cout << str << std::endl; //標準出力
+	send(connect, (server_IP + ": ACK").c_str(), 12, 0); //送信
 
 	//ソケットクローズ
 	close(connect);
