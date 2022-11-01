@@ -16,12 +16,22 @@ CXXFLAG=-std=c++11 -MMD
 .cpp.o:
 	$(CXX) $(CXXFLAG) -c $< -o $@
 
+all: $(NAME_SERVER) $(NAME_CLIENT)
+
 $(NAME_SERVER): $(OBJS_SERVER)
 	$(CXX) $(CXXFLAG) $(OBJS_SERVER) -o $(NAME_SERVER)
 
 $(NAME_CLIENT): $(OBJS_CLIENT)
 	$(CXX) $(CXXFLAG) $(OBJS_CLIENT) -o $(NAME_CLIENT)
 
+clean:
+	rm -rf $(OBJS_CLIENT)
+	rm -rf $(OBJS_SERVER)
+
+fclean: clean
+	rm -rf NAME_SERVER
+	rm -rf NAME_CLIENT
+
 -include $(DEPS_SERVER) $(DEPS_CLIENT)
 
-.PHONY: clean fclean re
+.PHONY: all clean fclean re
