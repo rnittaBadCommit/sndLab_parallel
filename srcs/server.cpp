@@ -17,7 +17,6 @@ Server::Server()
 
 	//ソケット登録
 	if(bind(sockfd, (struct sockaddr *)&addr, sizeof(addr)) < 0){
-		std::cerr << "Error bind:" << std::strerror(errno);
 		throw std::runtime_error("Error: bind() fail: port(" + std::to_string(PORT) + ")");
 	}
 
@@ -60,13 +59,6 @@ void Server::mainLoop()
 		try
 		{
 			recieved_msg = socket_.recieve_msg();
-			socket_.send_msg(recieved_msg.client_id, "HTTP/1.1 200 OK\nContent-Length: 11\nContent-Type: text/html\n\nHello World");
-			if (cd)
-				httpRequest_map_[recieved_msg.client_id] = recieved_msg.content;
-			std::cout << "===============================" << std::endl
-					  << httpRequest_map_[recieved_msg.client_id] << std::endl
-					  << "===============================" << std::endl;
-
 			return (true);
 		}
 		catch (const ft::Socket::recieveMsgFromNewClient &new_client)
