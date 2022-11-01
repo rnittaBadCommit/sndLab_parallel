@@ -13,11 +13,12 @@
 #include <iostream>  // cout
 #include <memory>    // shared_ptr
 #include <string>    // string
+#include <stdio.h>
 
 
 
 bool ExecCmd(const char* cmd, std::string& stdOut, int& exitCode) {
-    std::shared_ptr<FILE> pipe(_popen(cmd, "r"), [&](FILE* p) {exitCode = _pclose(p); });
+    std::shared_ptr<FILE> pipe(popen(cmd, "r"), [&](FILE* p) {exitCode = pclose(p); });
     if (!pipe) {
         return false;
     }
@@ -42,7 +43,6 @@ int main(){
         std::cout << "標準出力の取得に失敗しました。" << std::endl;
     }
 
-    system("pause");
     return 0;
 
 
