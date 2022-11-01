@@ -30,9 +30,9 @@ class Request
         Request& operator=(const Request& other);
 
         int getStatus() const;
-        std::string& getMethod() const;
-        std::string& getHeader() const;
-        std::string& getBody() const;
+        const std::string& getMethod() const;
+        const std::string& getHeader() const;
+        const std::string& getBody() const;
         void read(const std::string _content);
 
     private:
