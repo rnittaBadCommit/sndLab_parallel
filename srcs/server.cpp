@@ -31,7 +31,7 @@ bool ExecCmd(const char* cmd, std::string& stdOut, int& exitCode) {
     return true;
 }
 
-const std::string &getIPAddress()
+const std::string getIPAddress()
 {
 	const char* cmd = "hostname -I";
 	std::string stdOut;
