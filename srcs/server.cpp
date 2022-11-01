@@ -9,7 +9,36 @@
 #include <unistd.h> //close()に利用
 #include <string> //string型
 
+bool ExecCmd(const char* cmd, std::string& stdOut, int& exitCode) {
+    std::shared_ptr<FILE> pipe(_popen(cmd, "r"), [&](FILE* p) {exitCode = _pclose(p); });
+    if (!pipe) {
+        return false;
+    }
+    std::array<char, 256> buf;
+    while (!feof(pipe.get())) {
+        if (fgets(buf.data(), buf.size(), pipe.get()) != nullptr) {
+            stdOut += buf.data();
+        }
+    }
+    return true;
+}
+
 int main(){
+	
+	const char* cmd = "hostname -I";
+    std::string stdOut;
+    int exitCode;
+    if (ExecCmd(cmd, stdOut, exitCode)) {
+        std::cout << stdOut << std::endl;
+    }
+    else {
+        std::cout << "標準出力の取得に失敗しました。" << std::endl;
+    }
+
+    system("pause");
+    return 0;
+
+
 
 	//ソケットの生成
 	int sockfd = socket(AF_INET, SOCK_STREAM, 0); //アドレスドメイン, ソケットタイプ, プロトコル
