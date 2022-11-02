@@ -4,7 +4,7 @@ namespace rnitta
 {
 
 	Server::Server()
-	: IPAddress_(getIPAddress_())
+	: IPAddress_(getIPAddress_()), child_pid_(-1)
 	{
 		sockfd_ = socket(AF_INET, SOCK_STREAM, 0);
 		if (sockfd_ < 0)
@@ -86,12 +86,11 @@ namespace rnitta
 			try
 			{
 				recievedMsg = communicate_();
-std::cout << recievedMsg.content << std::endl;
+
 				request_map_[recievedMsg.client_fd].read(recievedMsg.content);
-				std::cout << "status: " << request_map_[recievedMsg.client_fd].getStatus() << std::endl;
 				if (request_map_[recievedMsg.client_fd].getStatus() == Request::FINISH)
 				{
-std::cout << "recievedMsg.client_fd: " << recievedMsg.client_fd << std::endl;
+					std::cout << "sending ACK" << std::endl;
 					send_msg_(recievedMsg.client_fd, IPAddress_ + ": ACK");
 					execute_cmd_(request_map_[recievedMsg.client_fd]);
 				}
@@ -183,7 +182,6 @@ std::cout << "sending\n";
 	{
 		msg_to_send_map_[fd].append(msg);
 		poll_fd_vec_[fd_to_index_map_[fd]].events = POLLOUT;
-std::cout << "index: " << fd_to_index_map_[fd] << std::endl;
 	}
 
 	void Server::close_fd_(const int _fd, const int _i_poll_fd)
@@ -248,19 +246,49 @@ std::cout << "index: " << fd_to_index_map_[fd] << std::endl;
 		}
 	}
 
+	void Server::execute_request(Request &_request)
+	{
+		if (_request.getMethod() == "RUN")
+		{
+			if (child_pid_ != -1)
+				execute_stop_();
+			execute_cmd_(_request);
+		}
+		else if (_request.getMethod() == "STOP")
+		{
+			execute_stop_();
+		}
+	}
+
 	void Server::execute_cmd_(Request &_request)
 	{
-		std::string stdOut;
-		int exitCode;
-		std::cout << "execute cmd: " + _request.getBody() << std::endl;
-		if (ExecCmd(_request.getBody().c_str(), stdOut, exitCode))
-		{
+		pid_t child_pid_ = fork();
+
+		if (child_pid_ == -1)
+			std::runtime_error("Error: fork()");
+		else if (child_pid_ == 0)
+		{	// child process
+			std::string stdOut;
+			int exitCode;
+			if (setpgid(getpid(), getpid()) == -1)
+				throw std::runtime_error("Error: setpgid()");
+			std::cout << "execute cmd: " + _request.getBody() << std::endl;
+			if (ExecCmd(_request.getBody().c_str(), stdOut, exitCode))
+			{
+			}
+			else
+			{
+				std::cout << "error: exec \"" << _request.getBody() << "\" fail" << std::endl;
+				exit(1);
+			}
+
+			exit(0);	// cmd DONE
 		}
-		else
-		{
-			std::cout << "error: exec \"" << _request.getBody() << "\" fail" << std::endl;
-			exit(1);
-		}
+	}
+
+	void Server::execute_stop_()
+	{
+		kill(-child_pid_, SIGKILL);
 	}
 
 	Server::recieveMsgFromNewClient::recieveMsgFromNewClient(const int client_fd)

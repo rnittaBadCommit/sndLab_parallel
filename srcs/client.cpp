@@ -8,8 +8,19 @@
 #include <unistd.h> //close()に利用
 #include <string> //string型
 
-int main(){
+int main(int argc, char **argv){
 
+	std::string s_str;
+	std::string _ip;
+	if (argc < 4)
+		s_str = "RUN 0  9 touch aaa";
+	else
+	{
+		_ip = argv[1];
+		std::string _method = argv[2];
+		std::string _body = argv[3];
+		s_str = _method + " 0  " + std::to_string(_body.size()) + " " + _body;
+	}
 	//ソケットの生成
 	int sockfd = socket(AF_INET, SOCK_STREAM, 0); //アドレスドメイン, ソケットタイプ, プロトコル
 	if(sockfd < 0){ //エラー処理
@@ -23,7 +34,7 @@ int main(){
 	memset(&addr, 0, sizeof(struct sockaddr_in)); //memsetで初期化
 	addr.sin_family = AF_INET; //アドレスファミリ(ipv4)
 	addr.sin_port = htons(8080); //ポート番号,htons()関数は16bitホストバイトオーダーをネットワークバイトオーダーに変換
-		addr.sin_addr.s_addr = inet_addr("192.168.2.215"); //IPアドレス,inet_addr()関数はアドレスの翻訳
+		addr.sin_addr.s_addr = inet_addr(_ip.c_str()); //IPアドレス,inet_addr()関数はアドレスの翻訳
 
 	//ソケット接続要求
 	if (connect(sockfd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0) //ソケット, アドレスポインタ, アドレスサイズ
@@ -33,7 +44,6 @@ int main(){
 	}
 
 	//データ送信
-	std::string s_str = "RUN 0  10 abcdefghij"; //送信データ格納用
 	send(sockfd, s_str.c_str(), s_str.size(), 0); //送信
 	std::cout << s_str << std::endl;
 

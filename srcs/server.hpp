@@ -17,6 +17,7 @@
 #include <memory>       // shared_ptr
 #include <string>       // string
 #include <stdio.h>
+#include <signal.h>
 
 #include <vector>
 #include <map>
@@ -41,8 +42,8 @@ namespace rnitta
     private:
         int sockfd_;        // socket fd
         int connection_fd_; // fd connected with client
-
-        const std::string IPAddress_;
+        pid_t child_pid_;
+        std::string IPAddress_;
 
         std::vector<struct pollfd> poll_fd_vec_;
         std::map<int, int> fd_to_index_map_;
@@ -65,6 +66,8 @@ namespace rnitta
         Request request;
         const int BUFFER_SIZE = 100;
 
+        void execute_request(Request &_request);
+        void execute_stop_();
         void add_pollfd_(const int _new_fd);
         void erase_pollfd_(const int _fd);
         void close_fd_(const int _fd, const int _i_poll_fd);
