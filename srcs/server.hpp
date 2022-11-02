@@ -46,6 +46,17 @@ class Server
         std::map<struct pollfd, int> pollfd_to_index_map_;
         std::set<int> registered_fd_set_;
 		std::map<int, std::string> msg_to_send_map_;
+        std::map<int, Request> request_map_;
+
+        class RecievedMsg
+		{
+            public:
+                RecievedMsg();
+                RecievedMsg(const std::string content, const int client_fd);
+                RecievedMsg operator=(const RecievedMsg &other);
+                std::string content;
+                int client_fd;
+		};
 
         struct sockaddr_in addr_;    // client addr(ipv4)
         const int PORT = 8080;
@@ -64,15 +75,15 @@ class Server
         class recieveMsgFromNewClient : public std::exception
 		{
             public:
-                recieveMsgFromNewClient(const int client_id);
-                const int client_id;
+                recieveMsgFromNewClient(const int client_fd);
+                const int client_fd;
 		};
 
 		class connectionHangUp : public std::exception
 		{
             public:
-                connectionHangUp(const int client_id);
-                const int client_id;
+                connectionHangUp(const int client_fd);
+                const int client_fd;
 		};
 
 		class NoRecieveMsg : public std::exception

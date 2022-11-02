@@ -41,6 +41,20 @@ Server::~Server()
 	close(connection_fd_);
 }
 
+Server::RecievedMsg::RecievedMsg(const std::string content, const int client_id)
+	: content(content), client_id(client_id)
+{
+}
+
+Server::RecievedMsg Server::RecievedMsg::operator=(const Server::RecievedMsg &other)
+{
+	if (this == &other)
+		return (*this);
+
+	content = other.content;
+	client_fd = other.client_fd;
+	return (*this);
+}
 
 void Server::add_pollfd_(const int new_fd)
 {
@@ -172,7 +186,7 @@ void Server::register_new_client_(int sock_fd)
 	last_recieve_time_map_[connection] = time(NULL);
 }
 
-std::string Server::recieve_msg_from_connected_client_(int _connection)
+Server::RecievedMsg Server::recieve_msg_from_connected_client_(int _connection)
 {
 	char buf[BUFFER_SIZE + 1];
 
