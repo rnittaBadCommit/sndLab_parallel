@@ -14,13 +14,14 @@ namespace rnitta
 		addr_.sin_family = AF_INET;
 		addr_.sin_port = htons(PORT);
 		addr_.sin_addr.s_addr = inet_addr(getIPAddress_().c_str());
-
+		std::cout << "IP Address: " << getIPAddress_() << std::endl;
+		
 		// ソケット登録
 		if (bind(sockfd_, (struct sockaddr *)&server_sockaddr, sizeof(server_sockaddr)) < 0)
-		{
 			throw std::runtime_error("Error: bind() fail: port(" + std::to_string(PORT) + ")");
-		}
 
+		if (listen(sockfd_, SOMAXCONN) < 0)
+			throw std::runtime_error("Error: listen()");
 		add_pollfd_(sockfd_);
 	}
 
