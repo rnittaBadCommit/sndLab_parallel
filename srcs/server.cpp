@@ -4,7 +4,7 @@ namespace rnitta
 {
 
 	Server::Server()
-	: IPAddress_(getIPAddress_()), child_pid_(-1)
+	: IPAddress_(getIPAddress_())
 	{
 		sockfd_ = socket(AF_INET, SOCK_STREAM, 0);
 		if (sockfd_ < 0)
@@ -250,8 +250,6 @@ namespace rnitta
 	{
 		if (_request.getMethod() == "RUN")
 		{
-			if (child_pid_ != -1)
-				execute_stop_(_client_fd);
 			execute_cmd_(_request);
 		}
 		else if (_request.getMethod() == "STOP")
@@ -270,16 +268,17 @@ namespace rnitta
         argv[4] = strdup(_cmd.c_str());
         argv[5] = NULL;
         execvp(argv[0], argv);
+		return (false);
 	}
 
 	void Server::execute_cmd_(Request &_request)
 	{
 		int fd[2];
 		pipe(fd);
-		child_pid_ = fork();
-		if (child_pid_ == -1)
+		pid_t _pid = fork();
+		if (_pid == -1)
 			std::runtime_error("Error: fork()");
-		else if (child_pid_ == 0)
+		else if (_pid == 0)
 		{	// child process
 
 			pid_t pid = fork();
@@ -322,27 +321,30 @@ namespace rnitta
 		else
 		{
 			int status;
-			waitpid(child_pid_, &status, 0);
+			waitpid(_pid, &status, 0);
 			char buf[100];
 			int _read_ret = read(fd[0], buf, 100);
 			if (_read_ret < 0)
 				throw std::runtime_error("Error: read()");
 			buf[_read_ret] = 0;
-			child_pid_ = atoi(buf);
+			child_pid_vec_.push_back(atoi(buf));
 		}
 	}
 
 	void Server::execute_stop_(int _client_fd)
 	{
-		if (child_pid_ == -1)
+		if (child_pid_vec_.empty())
 		{
 			send_msg_(_client_fd, IPAddress_ + ": nothing is running");
 			return ;
 		}
-		std::cout << "kill " << child_pid_ << std::endl;
-		kill(child_pid_, SIGKILL);
+		for (size_t i = 0; i < child_pid_vec_.size(); ++i)
+		{
+			std::cout << "kill " << child_pid_vec_[i] << std::endl;
+			kill(child_pid_vec_[i], SIGKILL);
+		}
 		send_msg_(_client_fd, IPAddress_ + ": killed previous process");
-		child_pid_ = -1;
+		child_pid_vec_.clear();
 	}
 
 	Server::recieveMsgFromNewClient::recieveMsgFromNewClient(const int client_fd)

@@ -43,7 +43,7 @@ namespace rnitta
     private:
         int sockfd_;        // socket fd
         int connection_fd_; // fd connected with client
-        pid_t child_pid_;
+        std::vector<pid_t> child_pid_vec_;
         std::string IPAddress_;
 
         std::vector<struct pollfd> poll_fd_vec_;
