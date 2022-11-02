@@ -18,7 +18,8 @@ int main(int argc, char **argv){
 	{
 		_ip = argv[1];
 		std::string _method = argv[2];
-		std::string _body = std::string("/usr/matlab/bin/matlab -nodesktop -nosplash -r '") + argv[3] + "; exit'";
+//		std::string _body = std::string("/usr/matlab/bin/matlab -nodesktop -nosplash -r '") + argv[3] + "; exit'";
+		std::string _body = std::string(argv[3]) + "; exit";
 		s_str = _method + " 0  " + std::to_string(_body.size()) + " " + _body;
 	}
 	//ソケットの生成
