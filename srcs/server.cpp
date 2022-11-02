@@ -263,34 +263,79 @@ std::cout << "sending\n";
 
 	void Server::execute_cmd_(Request &_request)
 	{
-		pid_t child_pid_ = fork();
-
+		int fd[2];
+		pipe(fd);
+		child_pid_ = fork();
 		if (child_pid_ == -1)
 			std::runtime_error("Error: fork()");
 		else if (child_pid_ == 0)
 		{	// child process
-			std::string stdOut;
-			int exitCode;
-			if (setpgid(getpid(), getpid()) == -1)
-				throw std::runtime_error("Error: setpgid()");
-			std::cout << "execute cmd: " + _request.getBody() << std::endl;
-			if (ExecCmd(_request.getBody().c_str(), stdOut, exitCode))
+
+			pid_t pid = fork();
+			if (pid < 0)
+				exit(1);
+			else if (pid == 0)
 			{
+				close(fd[0]);
+				close(fd[1]);
+				std::string stdOut;
+				int exitCode;
+				if (setpgid(getpid(), getpid()) == -1)
+				{
+					std::cerr << "Error: setpgid()" << std::endl;
+					exit(1);
+				}
+				std::cout << "execute cmd: " + _request.getBody() << std::endl;
+				if (ExecCmd(_request.getBody().c_str(), stdOut, exitCode))
+				{
+				}
+				else
+				{
+					std::cout << "error: exec \"" << _request.getBody() << "\" fail" << std::endl;
+					exit(1);
+				}
+
+				exit(0);	// cmd DONE
+
 			}
 			else
 			{
-				std::cout << "error: exec \"" << _request.getBody() << "\" fail" << std::endl;
-				exit(1);
+				std::string _pid_str = std::to_string(pid);
+				write(fd[1], _pid_str.c_str(), _pid_str.size());
+				close(fd[0]);
+				close(fd[1]);
+				std::cout << "child process done" << std::endl;
+				exit(0);
 			}
 
-			exit(0);	// cmd DONE
+		}
+		else
+		{
+			int status;
+			std::cout << "here\n";
+			waitpid(child_pid_, &status, 0);
+			std::cout << "here\n";
+			char buf[100];
+			int _read_ret = read(fd[0], buf, 100);
+			if (_read_ret < 0)
+				throw std::runtime_error("Error: read()");
+			buf[_read_ret] = 0;
+			child_pid_ = atoi(buf);	
+			std::cout << "child_pid_: " << child_pid_ << std::endl;
+				std::cout << "parent process done" << std::endl;
 		}
 	}
 
 	void Server::execute_stop_(int _client_fd)
 	{
+		if (child_pid_ == -1)
+		{
+			send_msg_(_client_fd, IPAddress_ + ": nothing is running");
+			return ;
+		}
 		kill(child_pid_, SIGKILL);
 		send_msg_(_client_fd, IPAddress_ + ": STOPPING");
+		child_pid_ = -1;
 	}
 
 	Server::recieveMsgFromNewClient::recieveMsgFromNewClient(const int client_fd)

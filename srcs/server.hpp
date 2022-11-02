@@ -18,6 +18,7 @@
 #include <string>       // string
 #include <stdio.h>
 #include <signal.h>
+#include <sys/wait.h>
 
 #include <vector>
 #include <map>
@@ -62,7 +63,7 @@ namespace rnitta
         };
 
         struct sockaddr_in server_sockaddr_; // server addr(ipv4)
-        const int PORT = 8080;
+        const int PORT = 8081;
         Request request;
         const int BUFFER_SIZE = 100;
 
