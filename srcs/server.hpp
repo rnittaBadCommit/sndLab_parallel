@@ -66,8 +66,8 @@ namespace rnitta
         Request request;
         const int BUFFER_SIZE = 100;
 
-        void execute_request(Request &_request);
-        void execute_stop_();
+        void execute_request(int _client_fd, Request &_request);
+        void execute_stop_(int _client_fd);
         void add_pollfd_(const int _new_fd);
         void erase_pollfd_(const int _fd);
         void close_fd_(const int _fd, const int _i_poll_fd);

@@ -92,7 +92,8 @@ namespace rnitta
 				{
 					std::cout << "sending ACK" << std::endl;
 					send_msg_(recievedMsg.client_fd, IPAddress_ + ": ACK");
-					execute_cmd_(request_map_[recievedMsg.client_fd]);
+					execute_request(recievedMsg.client_fd, request_map_[recievedMsg.client_fd]);
+					request_map_.erase(recievedMsg.client_fd);
 				}
 			}
 			catch (const recieveMsgFromNewClient &new_client)
@@ -246,17 +247,17 @@ std::cout << "sending\n";
 		}
 	}
 
-	void Server::execute_request(Request &_request)
+	void Server::execute_request(int _client_fd, Request &_request)
 	{
 		if (_request.getMethod() == "RUN")
 		{
 			if (child_pid_ != -1)
-				execute_stop_();
+				execute_stop_(_client_fd);
 			execute_cmd_(_request);
 		}
 		else if (_request.getMethod() == "STOP")
 		{
-			execute_stop_();
+			execute_stop_(_client_fd);
 		}
 	}
 
@@ -286,9 +287,10 @@ std::cout << "sending\n";
 		}
 	}
 
-	void Server::execute_stop_()
+	void Server::execute_stop_(int _client_fd)
 	{
-		kill(-child_pid_, SIGKILL);
+		kill(child_pid_, SIGKILL);
+		send_msg_(_client_fd, IPAddress_ + ": STOPPING");
 	}
 
 	Server::recieveMsgFromNewClient::recieveMsgFromNewClient(const int client_fd)
