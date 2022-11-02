@@ -86,9 +86,12 @@ namespace rnitta
 			try
 			{
 				recievedMsg = communicate_();
+std::cout << recievedMsg.content << std::endl;
 				request_map_[recievedMsg.client_fd].read(recievedMsg.content);
+				std::cout << "status: " << request_map_[recievedMsg.client_fd].getStatus() << std::endl;
 				if (request_map_[recievedMsg.client_fd].getStatus() == Request::FINISH)
 				{
+std::cout << "recievedMsg.client_fd: " << recievedMsg.client_fd << std::endl;
 					send_msg_(recievedMsg.client_fd, IPAddress_ + ": ACK");
 					execute_cmd_(request_map_[recievedMsg.client_fd]);
 				}
@@ -158,6 +161,7 @@ namespace rnitta
 			}
 			else if (poll_fd_vec_[i].revents & POLLOUT)
 			{
+std::cout << "sending\n";
 				poll_fd_vec_[i].revents = 0;
 				std::string &msg_to_send = msg_to_send_map_[poll_fd_vec_[i].fd];
 				size_t sent_num = send(poll_fd_vec_[i].fd, msg_to_send.c_str(),
@@ -179,6 +183,7 @@ namespace rnitta
 	{
 		msg_to_send_map_[fd].append(msg);
 		poll_fd_vec_[fd_to_index_map_[fd]].events = POLLOUT;
+std::cout << "index: " << fd_to_index_map_[fd] << std::endl;
 	}
 
 	void Server::close_fd_(const int _fd, const int _i_poll_fd)
@@ -201,6 +206,7 @@ namespace rnitta
 		poll_fd.revents = 0;
 		poll_fd_vec_.push_back(poll_fd);
 		registered_fd_set_.insert(connection);
+		fd_to_index_map_[connection] = poll_fd_vec_.size() - 1;
 	}
 
 	Server::RecievedMsg Server::recieve_msg_from_connected_client_(int _connection)

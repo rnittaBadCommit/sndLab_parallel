@@ -33,13 +33,13 @@ int main(){
 	}
 
 	//データ送信
-	char s_str[] = "HelloWorld!"; //送信データ格納用
-	send(sockfd, s_str, 12, 0); //送信
+	std::string s_str = "RUN 0  10 abcdefghij"; //送信データ格納用
+	send(sockfd, s_str.c_str(), s_str.size(), 0); //送信
 	std::cout << s_str << std::endl;
 
 	//データ受信
-	char r_str[12]; //受信データ格納用
-	recv(sockfd, r_str, 12, 0); //受信
+	char r_str[100]; //受信データ格納用
+	recv(sockfd, r_str, 100, 0); //受信
 	std::cout << r_str << std::endl; //標準出力
 
 	//ソケットクローズ
