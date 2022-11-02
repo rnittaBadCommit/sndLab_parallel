@@ -1,8 +1,9 @@
 # Prerequisites
 *.d
 
-server
+
 client
+server
 
 # Compiled Object files
 *.slo
