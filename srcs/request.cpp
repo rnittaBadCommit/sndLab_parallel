@@ -5,7 +5,7 @@ namespace rnitta
 
 
 Request::Request()
-: status_(METHOD), body_length_(SIZE_MAX)
+: status_(METHOD)
 {
 
 }
@@ -33,6 +33,12 @@ Request& Request::operator=(const Request& other)
     body_length_ = other.body_length_;
     body_ = other.body_;
     return (*this);
+}
+
+void Request::clear()
+{
+    status_ = METHOD;
+    save_ = "";
 }
 
 int Request::getStatus() const
