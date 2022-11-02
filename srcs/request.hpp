@@ -34,6 +34,7 @@ class Request
         const std::string& getHeader() const;
         const std::string& getBody() const;
         void read(const std::string _content);
+        void clear();
 
     private:
         int status_;
