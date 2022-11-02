@@ -32,6 +32,8 @@ fclean: clean
 	rm -rf NAME_SERVER
 	rm -rf NAME_CLIENT
 
+re: fclean $(NAME_SERVER) $(NAME_CLIENT)
+
 -include $(DEPS_SERVER) $(DEPS_CLIENT)
 
 .PHONY: all clean fclean re server client
