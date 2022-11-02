@@ -13,12 +13,12 @@ int main(int argc, char **argv){
 	std::string s_str;
 	std::string _ip;
 	if (argc < 4)
-		s_str = "RUN 0  9 touch aaa";
+		exit(1);
 	else
 	{
 		_ip = argv[1];
 		std::string _method = argv[2];
-		std::string _body = argv[3];
+		std::string _body = std::string("/usr/matlab/bin/matlab -nodesktop -nosplash -r '") + argv[3] + "; exit'";
 		s_str = _method + " 0  " + std::to_string(_body.size()) + " " + _body;
 	}
 	//ソケットの生成
