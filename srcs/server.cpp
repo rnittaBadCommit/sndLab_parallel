@@ -91,7 +91,7 @@ namespace rnitta
 				if (request_map_[recievedMsg.client_fd].getStatus() == Request::FINISH)
 				{
 					std::cout << "sending ACK" << std::endl;
-					send_msg_(recievedMsg.client_fd, IPAddress_ + ": ACK");
+					send_msg_(recievedMsg.client_fd, IPAddress_ + ": request recieved");
 					execute_request(recievedMsg.client_fd, request_map_[recievedMsg.client_fd]);
 					request_map_.erase(recievedMsg.client_fd);
 				}
@@ -161,7 +161,6 @@ namespace rnitta
 			}
 			else if (poll_fd_vec_[i].revents & POLLOUT)
 			{
-std::cout << "sending\n";
 				poll_fd_vec_[i].revents = 0;
 				std::string &msg_to_send = msg_to_send_map_[poll_fd_vec_[i].fd];
 				size_t sent_num = send(poll_fd_vec_[i].fd, msg_to_send.c_str(),
@@ -328,6 +327,7 @@ std::cout << "sending\n";
 			send_msg_(_client_fd, IPAddress_ + ": nothing is running");
 			return ;
 		}
+		std::cout << "kill " << child_pid_ << std::endl;
 		kill(child_pid_, SIGKILL);
 		send_msg_(_client_fd, IPAddress_ + ": killed previous process");
 		child_pid_ = -1;
