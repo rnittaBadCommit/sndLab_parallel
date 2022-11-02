@@ -41,6 +41,9 @@ namespace rnitta
     private:
         int sockfd_;        // socket fd
         int connection_fd_; // fd connected with client
+
+        const std::string IPAddress_;
+
         std::vector<struct pollfd> poll_fd_vec_;
         std::map<int, int> fd_to_index_map_;
         std::set<int> registered_fd_set_;

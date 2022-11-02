@@ -4,6 +4,7 @@ namespace rnitta
 {
 
 	Server::Server()
+	: IPAddress_(getIPAddress_())
 	{
 		sockfd_ = socket(AF_INET, SOCK_STREAM, 0);
 		if (sockfd_ < 0)
@@ -12,8 +13,8 @@ namespace rnitta
 		memset(&server_sockaddr_, 0, sizeof(struct sockaddr_in));
 		server_sockaddr_.sin_family = AF_INET;
 		server_sockaddr_.sin_port = htons(PORT);
-		server_sockaddr_.sin_addr.s_addr = inet_addr(getIPAddress_().c_str());
-		std::cout << "IP Address: " << getIPAddress_() << std::endl;
+		server_sockaddr_.sin_addr.s_addr = inet_addr(IPAddress_.c_str());
+		std::cout << "IP Address: " << IPAddress_ << std::endl;
 		
 		// ソケット登録
 		if (bind(sockfd_, (struct sockaddr *)&server_sockaddr_, sizeof(server_sockaddr_)) < 0)
@@ -87,7 +88,10 @@ namespace rnitta
 				recievedMsg = communicate_();
 				request_map_[recievedMsg.client_fd].read(recievedMsg.content);
 				if (request_map_[recievedMsg.client_fd].getStatus() == Request::FINISH)
+				{
+					send_msg_(recievedMsg.client_fd, IPAddress_ + ": ACK");
 					execute_cmd_(request_map_[recievedMsg.client_fd]);
+				}
 			}
 			catch (const recieveMsgFromNewClient &new_client)
 			{
@@ -242,6 +246,7 @@ namespace rnitta
 	{
 		std::string stdOut;
 		int exitCode;
+		std::cout << "execute cmd: " + _request.getBody() << std::endl;
 		if (ExecCmd(_request.getBody().c_str(), stdOut, exitCode))
 		{
 		}
