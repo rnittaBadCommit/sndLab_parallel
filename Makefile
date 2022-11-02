@@ -1,8 +1,8 @@
 NAME_SERVER="server"
 NAME_CLIENT="client"
 
-SRCS_SERVER=srcs/server.cpp
-SRSS_CLIENT=srcs/client.cpp
+SRCS_SERVER=srcs/server.cpp srcs/server_main.cpp srcs/request.cpp srcs/utils.cpp
+SRCS_CLIENT=srcs/client.cpp
 
 OBJS_SERVER=$(SRCS_SERVER:.cpp=.o)
 DEPS_SERVER=$(SRCS_SERVER:.cpp=.d)
@@ -36,4 +36,4 @@ re: fclean $(NAME_SERVER) $(NAME_CLIENT)
 
 -include $(DEPS_SERVER) $(DEPS_CLIENT)
 
-.PHONY: all clean fclean re server client
+.PHONY: all clean fclean re server client $(NAME_SERVER) $(NAME_CLIENT)
