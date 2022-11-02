@@ -57,7 +57,7 @@ namespace rnitta
             int client_fd;
         };
 
-        struct sockaddr_in addr_; // server addr(ipv4)
+        struct sockaddr_in server_sockaddr_; // server addr(ipv4)
         const int PORT = 8080;
         Request request;
         const int BUFFER_SIZE = 100;

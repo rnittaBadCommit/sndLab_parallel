@@ -5,19 +5,18 @@ namespace rnitta
 
 	Server::Server()
 	{
-		struct sockaddr_in server_sockaddr;
 		sockfd_ = socket(AF_INET, SOCK_STREAM, 0);
 		if (sockfd_ < 0)
 			throw std::runtime_error("Error: socket() fail");
 
-		memset(&addr_, 0, sizeof(struct sockaddr_in));
-		addr_.sin_family = AF_INET;
-		addr_.sin_port = htons(PORT);
-		addr_.sin_addr.s_addr = inet_addr(getIPAddress_().c_str());
+		memset(&server_sockaddr_, 0, sizeof(struct sockaddr_in));
+		server_sockaddr_.sin_family = AF_INET;
+		server_sockaddr_.sin_port = htons(PORT);
+		server_sockaddr_.sin_addr.s_addr = inet_addr(getIPAddress_().c_str());
 		std::cout << "IP Address: " << getIPAddress_() << std::endl;
 		
 		// ソケット登録
-		if (bind(sockfd_, (struct sockaddr *)&server_sockaddr, sizeof(server_sockaddr)) < 0)
+		if (bind(sockfd_, (struct sockaddr *)&server_sockaddr_, sizeof(server_sockaddr_)) < 0)
 			throw std::runtime_error("Error: bind() fail: port(" + std::to_string(PORT) + ")");
 
 		if (listen(sockfd_, SOMAXCONN) < 0)
@@ -36,7 +35,7 @@ namespace rnitta
 			return (*this);
 
 		sockfd_ = other.sockfd_;
-		addr_ = other.addr_;
+		server_sockaddr_ = other.server_sockaddr_;
 		connection_fd_ = other.connection_fd_;
 		request = other.request;
 		return (*this);
@@ -104,7 +103,8 @@ namespace rnitta
 			}
 			catch (const std::exception &e)
 			{
-				std::cerr << "Error: undetermined" << std::endl;
+				std::cerr << "Error: undetermined" << std::endl
+						  << e.what() << std::endl;
 				exit(1);
 			}
 		}
