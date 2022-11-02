@@ -304,7 +304,6 @@ std::cout << "sending\n";
 				write(fd[1], _pid_str.c_str(), _pid_str.size());
 				close(fd[0]);
 				close(fd[1]);
-				std::cout << "child process done" << std::endl;
 				exit(0);
 			}
 
@@ -312,17 +311,13 @@ std::cout << "sending\n";
 		else
 		{
 			int status;
-			std::cout << "here\n";
 			waitpid(child_pid_, &status, 0);
-			std::cout << "here\n";
 			char buf[100];
 			int _read_ret = read(fd[0], buf, 100);
 			if (_read_ret < 0)
 				throw std::runtime_error("Error: read()");
 			buf[_read_ret] = 0;
-			child_pid_ = atoi(buf);	
-			std::cout << "child_pid_: " << child_pid_ << std::endl;
-				std::cout << "parent process done" << std::endl;
+			child_pid_ = atoi(buf);
 		}
 	}
 
@@ -334,7 +329,7 @@ std::cout << "sending\n";
 			return ;
 		}
 		kill(child_pid_, SIGKILL);
-		send_msg_(_client_fd, IPAddress_ + ": STOPPING");
+		send_msg_(_client_fd, IPAddress_ + ": killed previous process");
 		child_pid_ = -1;
 	}
 
