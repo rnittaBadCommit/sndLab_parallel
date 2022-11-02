@@ -260,6 +260,18 @@ namespace rnitta
 		}
 	}
 
+	bool Server::execute_matlab_(const std::string _cmd)
+	{
+		char *argv[6];
+        argv[0] = strdup("/usr/matlab/bin/matlab");
+        argv[1] = strdup("-nodesktop");
+        argv[2] = strdup("nosplash");
+        argv[3] = strdup("-r");
+        argv[4] = strdup(_cmd.c_str());
+        argv[5] = NULL;
+        execvp(argv[0], argv);
+	}
+
 	void Server::execute_cmd_(Request &_request)
 	{
 		int fd[2];
@@ -285,7 +297,7 @@ namespace rnitta
 					exit(1);
 				}
 				std::cout << "execute cmd: " + _request.getBody() << std::endl;
-				if (ExecCmd(_request.getBody().c_str(), stdOut, exitCode))
+				if (execute_matlab_(_request.getBody()))
 				{
 				}
 				else

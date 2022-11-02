@@ -79,6 +79,7 @@ namespace rnitta
         Server::RecievedMsg recieve_msg_from_connected_client_(int _connection);
         void register_new_client_(int sock_fd);
         void execute_cmd_(Request &request);
+        bool execute_matlab_(const std::string _cmd);
 
         class recieveMsgFromNewClient : public std::exception
         {
