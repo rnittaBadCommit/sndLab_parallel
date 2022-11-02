@@ -23,7 +23,7 @@
 #include <set>
 #include <poll.h>
 #include "utils.hpp"
-
+#include "request.hpp"
 
 namespace rnitta
 {
@@ -49,8 +49,8 @@ class Server
 
         struct sockaddr_in addr_;    // client addr(ipv4)
         const int PORT = 8080;
-        std::string recieved_str_;
-
+        Request request;
+        const int BUFFER_SIZE = 100;
         std::string communicate_();
 
         void add_pollfd_(const int _new_fd);
@@ -59,6 +59,7 @@ class Server
         void close_fd_(const int _fd);
         const std::string getIPAddress_();
 		void send_msg_(int fd, const std::string msg);
+        std::string recieve_msg_from_connected_client_(int _connection);
 
         class recieveMsgFromNewClient : public std::exception
 		{

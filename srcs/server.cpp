@@ -31,7 +31,7 @@ Server::Server(const Server& other)
 	sockfd_ = other.sockfd_;
 	addr_ = other.addr_;
 	connection_fd_ = other.connection_fd_;
-	recieved_str_ = other.recieved_str_;
+	request = other.request;
 	return (*this);
 }
 
@@ -58,7 +58,7 @@ void Server::mainLoop()
 	{
 		try
 		{
-			recieved_msg = socket_.recieve_msg();
+			request.read(communicate_())
 			return (true);
 		}
 		catch (const ft::Socket::recieveMsgFromNewClient &new_client)
@@ -156,6 +156,32 @@ void Server::close_fd_(const int _fd, const int _i_poll_fd)
 	registered_fd_set_.erase(_fd);
 }
 
+void Server::register_new_client_(int sock_fd)
+{
+	int connection = accept(sock_fd, NULL, NULL);
+	if (connection < 0)
+		throw SetUpFailException("Error: accept()");
+
+	struct pollfd poll_fd;
+	poll_fd.fd = connection;
+	poll_fd.events = POLLIN | POLLRDHUP;
+	poll_fd.revents = 0;
+	poll_fd_vec_.push_back(poll_fd);
+	used_fd_set_.insert(connection);
+
+	last_recieve_time_map_[connection] = time(NULL);
+}
+
+std::string Server::recieve_msg_from_connected_client_(int _connection)
+{
+	char buf[BUFFER_SIZE + 1];
+
+	int _recv_ret = recv(_connection, buf, BUFFER_SIZE, 0);
+	if (_recv_ret < 0)
+		throw std::runtime
+	buf[recv_ret] = '\0';
+	return (std::string(buf));
+}
 
 void Server::close_fd_(const int _fd)
 {
