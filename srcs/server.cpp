@@ -283,7 +283,7 @@ namespace rnitta
 			if (exitCode == 0)
 			{
 				send_msg_(_client_fd, IPAddress_ + ": " + _cmd + "\n");
-				send_msg_(_client_fd, IPAddress_ + ": file list: "+ ExecCmd("ls"));
+				send_msg_(_client_fd, IPAddress_ + ": file list: "+ ReplaceString(ExecCmd("ls"), "\n", " "));
 			}
 			else
 			{
