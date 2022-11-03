@@ -298,18 +298,15 @@ namespace rnitta
 		{
 			std::string stdOut;
 			int exitCode;
-			std::string _cmd = std::string("cd ") + _request.getBody();
-			std::cerr << "execute cmd: " << _cmd << std::endl;
-			ExecCmd(_cmd.c_str(), stdOut, exitCode);
-			if (exitCode == 0)
+			std::cerr << "chdir to " << _request.getBody() << std::endl;
+			if (chdir(_request.getBody().c_str()) == 0)
 			{
-				send_msg_(_client_fd, IPAddress_ + ": execute cmd: " + _cmd + "\n");
 				send_msg_(_client_fd, IPAddress_ + ": current directory: " + ExecCmd("pwd"));
 				send_msg_(_client_fd, IPAddress_ + ": file list: "+ ReplaceString(ExecCmd("ls"), "\n", " ") + "\n");
 			}
 			else
 			{
-				send_msg_(_client_fd, IPAddress_ + ": Error: " + _cmd + " FAIL\n");
+				send_msg_(_client_fd, IPAddress_ + ": Error: chdir to " + _request.getBody() + " FAIL\n");
 				return ;
 			}
 		}
