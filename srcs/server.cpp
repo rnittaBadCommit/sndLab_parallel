@@ -184,6 +184,7 @@ namespace rnitta
 					close_fd_(poll_fd_vec_[i].fd, i);
 					poll_fd_vec_[i].events = POLLIN | POLLERR;
 				}
+				else
 				{
 					msg_to_send.erase(0, sent_num);
 				}

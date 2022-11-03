@@ -134,9 +134,11 @@ int main(int argc, char **argv){
 	std::cout << s_str << std::endl;
 	//データ受信
 	char r_str[1000]; //受信データ格納用
-	if (recv(sockfd, r_str, 1000, 0) != -1) //受信
+	if (int recv_ret = recv(sockfd, r_str, 1000, 0) != -1) //受信
+	{
+		r_str[recv_ret] = 0;
 		std::cout << r_str; //標準出力
-
+	}
 	//ソケットクローズ
 	close(sockfd);
 
