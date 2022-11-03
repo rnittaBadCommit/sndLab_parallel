@@ -276,14 +276,14 @@ namespace rnitta
 		{
 			std::string stdOut;
 			int exitCode;
-			execute_stop_(_client_fd);
 			std::string _cmd = std::string("cd ") + _request.getBody();
 			std::cerr << "execute cmd: " << _cmd << std::endl;
 			ExecCmd(_cmd.c_str(), stdOut, exitCode);
 			if (exitCode == 0)
 			{
-				send_msg_(_client_fd, IPAddress_ + ": " + _cmd + "\n");
-				send_msg_(_client_fd, IPAddress_ + ": file list: "+ ReplaceString(ExecCmd("ls"), "\n", " "));
+				send_msg_(_client_fd, IPAddress_ + ": execute cmd: " + _cmd + "\n");
+				send_msg_(_client_fd, IPAddress_ + ": current directory: " + ExecCmd("pwd"));
+				send_msg_(_client_fd, IPAddress_ + ": file list: "+ ReplaceString(ExecCmd("ls"), "\n", " ") + "\n");
 			}
 			else
 			{
