@@ -2,7 +2,7 @@ NAME_SERVER="server"
 NAME_CLIENT="client"
 
 SRCS_SERVER=srcs/server.cpp srcs/server_main.cpp srcs/request.cpp srcs/utils.cpp
-SRCS_CLIENT=srcs/client.cpp
+SRCS_CLIENT=srcs/client.cpp srcs/utils.cpp
 
 OBJS_SERVER=$(SRCS_SERVER:.cpp=.o)
 DEPS_SERVER=$(SRCS_SERVER:.cpp=.d)
