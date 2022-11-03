@@ -131,7 +131,7 @@ int main(int argc, char **argv){
 
 	//データ送信
 	send(sockfd, s_str.c_str(), s_str.size(), 0); //送信
-	std::cout << s_str << std::endl;
+
 	//データ受信
 	char r_str[1000]; //受信データ格納用
 	if (int recv_ret = recv(sockfd, r_str, 1000, 0) != -1) //受信
