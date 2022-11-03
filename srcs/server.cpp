@@ -285,7 +285,9 @@ namespace rnitta
 					std::cerr << "Error: send() fail: can't to send response, response is discarded\n";
 				if (sent_num == -1 || sent_num == s_str.size()) // 送信未完了
 				{
+exit(0);
 					close_all_fd_();
+					exit(0);
 				}
 				else
 				{
