@@ -287,6 +287,7 @@ namespace rnitta
 				{
 					close_all_fd_();
 				}
+				else
 				{
 					s_str.erase(0, sent_num);
 				}
