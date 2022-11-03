@@ -43,4 +43,17 @@ namespace rnitta
         return (stdOut);
     }
 
+    std::string ReplaceString(std::string string, std::string to_find, std::string to_string)
+    {
+        std::string::size_type  Pos( string.find( to_find ) );
+    
+        while( Pos != std::string::npos )
+        {
+            string.replace( Pos, to_find.length(), to_string );
+            Pos = string.find( to_find, Pos + to_string.length() );
+        }
+    
+        return string;
+    }
+
 }
