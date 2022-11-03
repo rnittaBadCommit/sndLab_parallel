@@ -19,14 +19,23 @@ void err_args()
 
 void err_args(const std::string _method)
 {
+	std::cerr << "usage: ";
+
 	if (_method == "RUN")
 	{
-
+		std::cerr << "./client [IP Address] RUN [function name] [Eb]";
 	}
 	else if (_method == "CHDIR")
 	{
-
+		std::cerr << "./client [IP Address] CHDIR [destination path]";
 	}
+	else if (_method == "CMD")
+	{
+		std::cerr << "./client [IP Address] CMD \"[cmd args]\"";
+	}
+	std::cerr << std::endl
+			<< "more info at https://github.com/rnittaBadCommit/sndLab_parallel/blob/main/README.md" << std::endl;
+	exit(1);
 }
 
 void set_str_to_send(int argc, char **argv, std::string& s_str)
@@ -125,8 +134,8 @@ int main(int argc, char **argv){
 	std::cout << s_str << std::endl;
 	//データ受信
 	char r_str[1000]; //受信データ格納用
-	recv(sockfd, r_str, 1000, 0); //受信
-	std::cout << r_str; //標準出力
+	if (recv(sockfd, r_str, 1000, 0) != -1) //受信
+		std::cout << r_str; //標準出力
 
 	//ソケットクローズ
 	close(sockfd);

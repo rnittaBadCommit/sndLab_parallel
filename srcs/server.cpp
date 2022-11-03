@@ -175,13 +175,17 @@ namespace rnitta
 				std::string &msg_to_send = msg_to_send_map_[poll_fd_vec_[i].fd];
 				size_t sent_num = send(poll_fd_vec_[i].fd, msg_to_send.c_str(),
 									   msg_to_send.size(), 0);
-				if (sent_num != msg_to_send.size()) // 送信未完了
-					msg_to_send.erase(0, sent_num);
-				else
+				
+				if (sent_num == -1)
+					std::cerr << "Error: send() fail: can't to send response, response is discarded\n";
+				if (sent_num == -1 || sent_num == msg_to_send.size()) // 送信未完了
 				{
 					msg_to_send_map_.erase(poll_fd_vec_[i].fd);
 					close_fd_(poll_fd_vec_[i].fd, i);
 					poll_fd_vec_[i].events = POLLIN | POLLERR;
+				}
+				{
+					msg_to_send.erase(0, sent_num);
 				}
 			}
 		}
@@ -270,6 +274,22 @@ namespace rnitta
 		else if (_method == "SHUTDOWN")
 		{
 			execute_stop_(_client_fd);
+			std::string s_str = "server is stopped. bye\n";
+
+			while (!s_str.empty())
+			{
+				size_t sent_num = send(poll_fd_vec_[1].fd, s_str.c_str(),
+										s_str.size(), 0);
+				if (sent_num == -1)
+					std::cerr << "Error: send() fail: can't to send response, response is discarded\n";
+				if (sent_num == -1 || sent_num == s_str.size()) // 送信未完了
+				{
+					close_all_fd_();
+				}
+				{
+					s_str.erase(0, sent_num);
+				}
+			}
 			exit(0);
 		}
 		else if (_method == "CHDIR")
