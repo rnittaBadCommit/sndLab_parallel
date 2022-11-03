@@ -10,8 +10,8 @@
 1. matlabのメイン関数を置くディレクトリ(以下"作業ディレクトリ")を作成し、作業ディレクトリに移動
 2. 下記をコピペして実行ファイルの作成<br>
 ```git clone https://github.com/rnittaBadCommit/sndLab_parallel.git; cd sndLab_parallel; make; mv server client ..; cd ..```
-3. 各計算機サーバでserverを起動する<br>
-```./server```
+3. 各計算機サーバでserverを起動する（一度起動したらログアウトして構いません）<br>
+```nohup ./server&```
 <br><br>
 
 ### matlabを実行させる
