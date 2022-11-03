@@ -277,23 +277,19 @@ namespace rnitta
 			std::string stdOut;
 			int exitCode;
 			execute_stop_(_client_fd);
-			std::string _cmd = std::string("cp server ") + _request.getBody();
+			std::string _cmd = std::string("cd ") + _request.getBody();
 			std::cerr << "execute cmd: " << _cmd << std::endl;
 			ExecCmd(_cmd.c_str(), stdOut, exitCode);
 			if (exitCode == 0)
+			{
 				send_msg_(_client_fd, IPAddress_ + ": " + _cmd + "\n");
+				send_msg_(_client_fd, IPAddress_ + ": file list: "+ ExecCmd("ls"));
+			}
 			else
 			{
-				send_msg_(_client_fd, IPAddress_ + ": Error: cp server " + _request.getBody() + " FAIL\n");
+				send_msg_(_client_fd, IPAddress_ + ": Error: " + _cmd + " FAIL\n");
 				return ;
 			}
-			std::string file_path = _request.getBody() + "/server";
-			char *argv[1];
-			argv[0] = NULL;
-			close_all_fd_();
-			std::cerr << "file_path: " << file_path << std::endl;
-			execvp(file_path.c_str(), argv);
-			send_msg_(_client_fd, IPAddress_ + ": Error: can't run server(current server will be running)\n");
 		}
 	}
 
