@@ -66,7 +66,9 @@ namespace rnitta
         const int PORT = 8081;
         Request request;
         const int BUFFER_SIZE = 100;
+        const int TRIAL_MAX = 30;
 
+        void close_all_fd_();
         void execute_request(int _client_fd, Request &_request);
         void execute_stop_(int _client_fd);
         void add_pollfd_(const int _new_fd);

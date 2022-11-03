@@ -7,6 +7,7 @@ namespace rnitta
 	: IPAddress_(getIPAddress_())
 	{
 		sockfd_ = socket(AF_INET, SOCK_STREAM, 0);
+		std::cout << "sockfd_: " << sockfd_ << std::endl;
 		if (sockfd_ < 0)
 			throw std::runtime_error("Error: socket() fail");
 
@@ -17,12 +18,22 @@ namespace rnitta
 		std::cerr << "IP Address: " << IPAddress_ << std::endl;
 		
 		// ソケット登録
-		if (bind(sockfd_, (struct sockaddr *)&server_sockaddr_, sizeof(server_sockaddr_)) < 0)
-			throw std::runtime_error("Error: bind() fail: port(" + std::to_string(PORT) + ")");
+		for (int i = 0; i < TRIAL_MAX; ++i)
+		{
+			if (bind(sockfd_, (struct sockaddr *)&server_sockaddr_, sizeof(server_sockaddr_)) == 0)
+				break;
+			else if (i == TRIAL_MAX - 1)
+				throw std::runtime_error("Error: bind() fail: port(" + std::to_string(PORT) + ")");
+			if (i == 0)
+				std::cerr << "bind max trial = " << TRIAL_MAX << std::endl;
+				std::cerr << "bind fail(trial = " << i << ")\n";
+				sleep(10);
+		}
 
 		if (listen(sockfd_, SOMAXCONN) < 0)
 			throw std::runtime_error("Error: listen()");
 		add_pollfd_(sockfd_);
+		std::cerr << "setup finish\n";
 	}
 
 	Server::Server(const Server &other)
@@ -248,13 +259,50 @@ namespace rnitta
 
 	void Server::execute_request(int _client_fd, Request &_request)
 	{
-		if (_request.getMethod() == "RUN")
+		std::string _method = _request.getMethod();
+		if (_method == "RUN")
 		{
 			execute_cmd_(_request);
 		}
-		else if (_request.getMethod() == "STOP")
+		else if (_method == "STOP")
 		{
 			execute_stop_(_client_fd);
+		}
+		else if (_method == "SHUTDOWN")
+		{
+			execute_stop_(_client_fd);
+			exit(0);
+		}
+		else if (_method == "CHDIR")
+		{
+			std::string stdOut;
+			int exitCode;
+			execute_stop_(_client_fd);
+			std::string _cmd = std::string("cp server ") + _request.getBody();
+			std::cerr << "execute cmd: " << _cmd << std::endl;
+			ExecCmd(_cmd.c_str(), stdOut, exitCode);
+			if (exitCode == 0)
+				send_msg_(_client_fd, IPAddress_ + ": " + _cmd + "\n");
+			else
+			{
+				send_msg_(_client_fd, IPAddress_ + ": Error: mv server " + _request.getBody() + " FAIL\n");
+				return ;
+			}
+			std::string file_path = _request.getBody() + "/server";
+			char *argv[1];
+			argv[0] = NULL;
+			close_all_fd_();
+			execvp(file_path.c_str(), argv);
+			send_msg_(_client_fd, IPAddress_ + ": Error: can't run server(current server will be running)\n");
+		}
+	}
+
+	void Server::close_all_fd_()
+	{
+		size_t _poll_fd_vec_size = poll_fd_vec_.size();
+		for (size_t i = 0; i < _poll_fd_vec_size; ++i)
+		{
+			close_fd_(poll_fd_vec_[i].fd, i);
 		}
 	}
 
@@ -263,7 +311,7 @@ namespace rnitta
 		char *argv[6];
         argv[0] = strdup("/usr/matlab/bin/matlab");
         argv[1] = strdup("-nodesktop");
-        argv[2] = strdup("nosplash");
+        argv[2] = strdup("-nosplash");
         argv[3] = strdup("-r");
         argv[4] = strdup(_cmd.c_str());
         argv[5] = NULL;
