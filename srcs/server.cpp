@@ -55,8 +55,7 @@ namespace rnitta
 
 	Server::~Server()
 	{
-		close(sockfd_);
-		close(connection_fd_);
+		close_all_fd_();
 	}
 
 	Server::RecievedMsg::RecievedMsg()
@@ -285,13 +284,14 @@ namespace rnitta
 				send_msg_(_client_fd, IPAddress_ + ": " + _cmd + "\n");
 			else
 			{
-				send_msg_(_client_fd, IPAddress_ + ": Error: mv server " + _request.getBody() + " FAIL\n");
+				send_msg_(_client_fd, IPAddress_ + ": Error: cp server " + _request.getBody() + " FAIL\n");
 				return ;
 			}
 			std::string file_path = _request.getBody() + "/server";
 			char *argv[1];
 			argv[0] = NULL;
 			close_all_fd_();
+			std::cerr << "file_path: " << file_path << std::endl;
 			execvp(file_path.c_str(), argv);
 			send_msg_(_client_fd, IPAddress_ + ": Error: can't run server(current server will be running)\n");
 		}
