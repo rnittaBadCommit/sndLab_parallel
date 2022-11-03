@@ -14,7 +14,7 @@ namespace rnitta
 		server_sockaddr_.sin_family = AF_INET;
 		server_sockaddr_.sin_port = htons(PORT);
 		server_sockaddr_.sin_addr.s_addr = inet_addr(IPAddress_.c_str());
-		std::cout << "IP Address: " << IPAddress_ << std::endl;
+		std::cerr << "IP Address: " << IPAddress_ << std::endl;
 		
 		// ソケット登録
 		if (bind(sockfd_, (struct sockaddr *)&server_sockaddr_, sizeof(server_sockaddr_)) < 0)
@@ -90,8 +90,8 @@ namespace rnitta
 				request_map_[recievedMsg.client_fd].read(recievedMsg.content);
 				if (request_map_[recievedMsg.client_fd].getStatus() == Request::FINISH)
 				{
-					std::cout << "sending ACK" << std::endl;
-					send_msg_(recievedMsg.client_fd, IPAddress_ + ": request recieved");
+					std::cerr << "sending ACK" << std::endl;
+					send_msg_(recievedMsg.client_fd, IPAddress_ + ": request recieved\n");
 					execute_request(recievedMsg.client_fd, request_map_[recievedMsg.client_fd]);
 					request_map_.erase(recievedMsg.client_fd);
 				}
@@ -241,7 +241,7 @@ namespace rnitta
 		}
 		else
 		{
-			std::cout << "error: exec \"hostname -I\" fail" << std::endl;
+			std::cerr << "error: exec \"hostname -I\" fail" << std::endl;
 			exit(1);
 		}
 	}
@@ -295,13 +295,13 @@ namespace rnitta
 					std::cerr << "Error: setpgid()" << std::endl;
 					exit(1);
 				}
-				std::cout << "execute cmd: " + _request.getBody() << std::endl;
+				std::cerr << "execute cmd: " + _request.getBody() << std::endl;
 				if (execute_matlab_(_request.getBody()))
 				{
 				}
 				else
 				{
-					std::cout << "error: exec \"" << _request.getBody() << "\" fail" << std::endl;
+					std::cerr << "error: exec \"" << _request.getBody() << "\" fail" << std::endl;
 					exit(1);
 				}
 
@@ -335,15 +335,15 @@ namespace rnitta
 	{
 		if (child_pid_vec_.empty())
 		{
-			send_msg_(_client_fd, IPAddress_ + ": nothing is running");
+			send_msg_(_client_fd, IPAddress_ + ": nothing is running\n");
 			return ;
 		}
 		for (size_t i = 0; i < child_pid_vec_.size(); ++i)
 		{
-			std::cout << "kill " << child_pid_vec_[i] << std::endl;
+			std::cerr << "kill " << child_pid_vec_[i] << std::endl;
 			kill(child_pid_vec_[i], SIGKILL);
 		}
-		send_msg_(_client_fd, IPAddress_ + ": killed previous process");
+		send_msg_(_client_fd, IPAddress_ + ": killed previous process\n");
 		child_pid_vec_.clear();
 	}
 
