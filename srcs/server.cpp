@@ -313,6 +313,7 @@ namespace rnitta
 		}
 		else if (_method == "CMD")
 		{
+			std::cerr << "execute cmd: " << _request.getBody().c_str() << std::endl;
 			send_msg_(_client_fd, IPAddress_ + ": " + ExecCmd(_request.getBody().c_str()));
 		}
 	}
