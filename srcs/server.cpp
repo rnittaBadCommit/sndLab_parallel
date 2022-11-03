@@ -291,6 +291,10 @@ namespace rnitta
 				return ;
 			}
 		}
+		else if (_method == "CMD")
+		{
+			send_msg_(_client_fd, IPAddress_ + ": " + ExecCmd(_request.getBody().c_str()));
+		}
 	}
 
 	void Server::close_all_fd_()

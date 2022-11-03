@@ -77,6 +77,13 @@ void set_str_to_send(int argc, char **argv, std::string& s_str)
 		std::cout << _body << std::endl;
 		s_str = "CHDIR 0  " + std::to_string(_body.size()) + " " + _body;
 	}
+	else if (argv[2] == std::string("CMD"))
+	{
+		if (argc < 4)
+			err_args("CMD");
+		
+		s_str = "CMD 0  " + std::to_string(strlen(argv[3])) + " " + argv[3];
+	}
 	else
 	{
 		exit(1);
