@@ -5,11 +5,36 @@
 * matlabのコード内で並列実行しない(parfor等を使わない)
 <br><br>
 
+## ISSUE
+誰のアカウントでログインしてもPORTの使用状況は共有される、というのを知りませんでした。そのため、ハードコードで8081番を使っています。
+誰かが既に8081番でserverを走らせている場合、serverを起動できません。
+そのため、
+srcs/server.hpp内66行目の
+const int PORT = 8081;を適当に8082とかに変えて、
+sndLab_parallelディレクトリ直下で
+```make```
+と打ってください。その後
+```
+./server
+```
+と実行して、サーバーが立ち上がったのを確認したらCtrl+cで実行を停止。
+今度は
+```
+nohup ./server&
+```
+と実行してください。
+最後に、
+srcs/client.cpp内122行目の
+addr.sin_port = htons(8081); //ポート番号,htons()関数は16bitホストバイトオーダーをネットワークバイトオーダーに変換
+の8081を、先ほどと同じ数字に書き換えて、再びsndLab_parallelディレクトリ直下で
+```make```
+と実行してください。
+
 ## 使い方
 ### 事前準備
 1. matlabのメイン関数を置くディレクトリ(以下"作業ディレクトリ")を作成し、作業ディレクトリに移動
 2. 下記をコピペして実行ファイルの作成<br>
-```git clone https://github.com/rnittaBadCommit/sndLab_parallel.git; cd sndLab_parallel; make; mv server client ..; cd ..```
+```git clone https://github.com/rnittaBadCommit/sndLab_parallel.git; cd sndLab_parallel; make;```
 3. 各計算機サーバでserverを起動する（一度起動したらログアウトして構いません）<br>
 ```nohup ./server&```
 <br><br>
