@@ -50,14 +50,14 @@ addr.sin_port = htons(8081); //ポート番号,htons()関数は16bitホストバ
 （呼んでいただければ設定して使える状態にしに行きます。）
 
 また、同様の理由で、脆弱性の極みになっています。
-他の人のPORTにcliantからリクエストを送ることが出来てしまいます。
+多分他の人のPORTにcliantからリクエストを送ることが出来てしまいます。
 (広く使われている意味での)性善説で成り立ちます。
 
 この問題は、現在作成中のVer2で修正される予定です。
 
 ## 使い方
 ### 事前準備
-1. matlabのメイン関数を置くディレクトリ(以下"作業ディレクトリ")を作成し、作業ディレクトリに移動
+1. git, gcc, makeを使える状態にする<br>
 2. 下記をコピペして実行ファイルの作成<br>
 ```git clone https://github.com/rnittaBadCommit/sndLab_parallel.git; cd sndLab_parallel; make;```
 3. 各計算機サーバでserverを起動する（一度起動したらログアウトして構いません）<br>
@@ -65,14 +65,30 @@ addr.sin_port = htons(8081); //ポート番号,htons()関数は16bitホストバ
 <br><br>
 
 ### matlabを実行させる
-1. 作業ディレクトリにメイン関数を置く
+1. 各計算機サーバのserverを、実行したいmatlabのファイルがある場所に移動させる。<br>
+（既にその場所にいるなら省略可）<br>
+```./client 192.168.2.100 CHDIR ~/my_project/srcs/matlab/```
 2. `client`を使って`server`に実行リクエストを送る<br>
-	＊メイン関数名は、ファイル名ではありません(○test, ☓test.m)<br>
+	＊プログラム名は「test.m」なら「test」 です<br>
 	＊クライアントの場所はどこでも大丈夫です<br>
 ```./client [稼働させたい計算機サーバのIP] RUN [メイン関数の関数名] [Eb]```<br>
 
 *.shファイルを書いて楽をしましょう<br>
-例: 
+例:   
+
+chdir.sh
+```
+DEST_DIR = ~/git/graduation_thesis/
+
+./client 192.168.2.215 CHDIR $DEST_DIR
+./client 192.168.2.216 CHDIR $DEST_DIR
+./client 192.168.2.217 CHDIR $DEST_DIR
+./client 192.168.2.218 CHDIR $DEST_DIR
+./client 192.168.2.219 CHDIR $DEST_DIR
+./client 192.168.2.220 CHDIR $DEST_DIR
+```
+
+start.sh  
 ```
 PROGRAM_NAME="test"
 
@@ -83,6 +99,8 @@ PROGRAM_NAME="test"
 ./client 192.168.2.219 RUN $PROGRAM_NAME 5
 ./client 192.168.2.220 RUN $PROGRAM_NAME 6
 ```
+
+stop.sh
 ```
 ./client 192.168.2.215 STOP
 ./client 192.168.2.216 STOP
@@ -105,7 +123,7 @@ PROGRAM_NAME="test"
 	<dt>RUN</dt>
 	<dd>
 		matlabを実行させる<br>
-		<code>./client [実行を止めたい計算機サーバのIP] RUN [メイン関数の関数名] [Eb]</code><br>
+		<code>./client [実行を止めたい計算機サーバのIP] RUN [プログラム名] [引数]</code><br>
 		例： <code>./client 192.168.2.100 RUN Main_func 42</code>
 	</dd>
 	<dt>STOP</dt>
@@ -119,11 +137,6 @@ PROGRAM_NAME="test"
 		serverを止める（計算サーバ自体を止めるわけではありません）<br>
 		<code>./client [実行を止めたい計算機サーバのIP] STOP</code><br>
 		例： <code>./client 192.168.2.100 SHUTDOWN</code>
-	</dd>
-	<dt>SHUTDOWN</dt>
-	<dd>
-		serverを止める<br>
-		<code>./client [実行を止めたい計算機サーバのIP] STOP</code>
 	</dd>
 	<dt>CHDIR</dt>
 	<dd>
@@ -144,7 +157,7 @@ PROGRAM_NAME="test"
 <br><br>
 
 ## コメント
-MITライセンスを適用しており、複製、改変、再頒布を認めています。<br>
+複製、改変、再頒布して大丈夫です。<br>
 ただ、issueを書いたりPRをしてくれると嬉しいです。<br>
 機能の改善・追加要望やバグ修正要望などがあればissueを書いてください。<br>
 issueに書かれたものは気が向いたら返信した上で取り組みます。
